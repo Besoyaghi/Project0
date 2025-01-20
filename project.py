@@ -1,117 +1,132 @@
 import streamlit as st
+import pandas as pd
 
-# Main function
-def main():
-    st.sidebar.title("Dubai Schools")
-    choice = st.sidebar.selectbox("Choose a feature:", 
-                                   ["Home", 
-                                    "Online Attestation", 
-                                    "School Search", 
-                                    "University Search", 
-                                    "Parent-Teacher Communication", 
-                                    "Student Services Hub", 
-                                    "Transportation Management", 
-                                    "Payment Gateway", 
-                                    "Events & Announcements", 
-                                    "Student Records", 
-                                    "AI-Powered Guidance"])
+# Placeholder data for schools
+schools_data = pd.DataFrame({
+    'School Name': ['Dubai International School', 'GEMS Modern Academy', 'American School of Dubai'],
+    'Location': ['Al Barsha', 'Nad Al Sheba', 'Al Barsha'],
+    'Curriculum': ['British', 'Indian', 'American'],
+    'Tuition Fees': [50000, 45000, 60000],
+    'KHDA Rating': ['Outstanding', 'Very Good', 'Good'],
+    'Student-Teacher Ratio': [12, 15, 10],
+    'Extracurricular Activities': ['Sports, Music', 'Science Clubs, Arts', 'Drama, Coding'],
+    'Facilities': ['Pool, Labs, Library', 'Labs, Arts Studio', 'Auditorium, Gym']
+})
 
-    if choice == "Home":
-        st.title("Welcome to Dubai Schools!")
-        st.write("Your one-stop platform for all educational services in the UAE.")
+# Placeholder data for universities
+universities_data = pd.DataFrame({
+    'University Name': ['University of Dubai', 'American University of Sharjah', 'NYU Abu Dhabi'],
+    'Location': ['Dubai', 'Sharjah', 'Abu Dhabi'],
+    'Admission Criteria': ['IELTS 6.5', 'SAT 1200', 'High GPA + Interview'],
+    'Scholarships': ['Merit-Based', 'Need-Based', 'Merit & Need-Based'],
+    'Application Deadline': ['30 May 2025', '15 June 2025', '1 July 2025'],
+    'Programs Offered': ['Business, IT, Engineering', 'Arts, Sciences, Engineering', 'Global Studies, AI']
+})
 
-    elif choice == "Online Attestation":
-        online_attestation()
+# Improved layout with dropdown navigation
+menu_options = {
+    "🏠 Home": "Home",
+    "📄 Online Attestation": "Online Attestation",
+    "🎓 School Search": "School Search",
+    "🏫 University Search": "University Search",
+    "💬 Parent-Teacher Communication": "Parent-Teacher Communication",
+    "📚 Student Services": "Student Services",
+    "🚌 Transportation Management": "Transportation Management",
+    "💳 Payment Gateway": "Payment Gateway",
+    "📅 Events & Announcements": "Events & Announcements",
+    "📁 Student Records": "Student Records",
+    "🤖 AI-Powered Guidance": "AI-Powered Guidance"
+}
 
-    elif choice == "School Search":
-        school_search()
+# Sidebar dropdown
+selected_tab = st.sidebar.selectbox("Navigate to:", list(menu_options.keys()))
 
-    elif choice == "University Search":
-        university_search()
+# Tab routing
+if menu_options[selected_tab] == "Home":
+    st.image("https://upload.wikimedia.org/wikipedia/commons/4/45/Flag_of_Dubai.svg", use_column_width=True)
+    st.title("Welcome to Dubai Schools & Universities Hub")
+    st.write("""
+    This app is your comprehensive platform for managing educational services and exploring schools 
+    and universities in Dubai. Use the sidebar to navigate.
+    """)
 
-    elif choice == "Parent-Teacher Communication":
-        parent_teacher_communication()
+elif menu_options[selected_tab] == "Online Attestation":
+    st.title("Online Attestation Service")
+    st.write("Upload documents for attestation (e.g., birth certificates, diplomas).")
+    uploaded_files = st.file_uploader("Upload files:", accept_multiple_files=True)
+    if uploaded_files:
+        for file in uploaded_files:
+            st.success(f"Uploaded: {file.name}")
+        st.info("Your documents are being processed. Expect updates within 24-48 hours.")
 
-    elif choice == "Student Services Hub":
-        student_services()
-
-    elif choice == "Transportation Management":
-        transportation_management()
-
-    elif choice == "Payment Gateway":
-        payment_gateway()
-
-    elif choice == "Events & Announcements":
-        events_announcements()
-
-    elif choice == "Student Records":
-        student_records()
-
-    elif choice == "AI-Powered Guidance":
-        ai_guidance()
-
-# Feature 1: Online Attestation
-def online_attestation():
-    st.title("Online Attestation")
-    st.write("Upload your documents for KHDA attestation.")
-    doc = st.file_uploader("Upload your document (PDF only):", type=["pdf"])
-    if st.button("Submit"):
-        if doc:
-            st.success("Document uploaded successfully! Verification in progress.")
-        else:
-            st.error("Please upload a valid document.")
-
-# Feature 2: School Search
-def school_search():
+elif menu_options[selected_tab] == "School Search":
     st.title("School Search")
-    st.write("Search schools based on KHDA rating, curriculum, and more.")
-    curriculum = st.selectbox("Select Curriculum", ["British", "American", "IB", "Indian"])
-    rating = st.slider("Minimum KHDA Rating", 1, 5, 3)
-    location = st.text_input("Preferred Location")
-    if st.button("Search"):
-        st.write(f"Results for schools with {curriculum} curriculum, rating {rating}+ in {location}:")
-
-# Feature 3: Payment Gateway
-def payment_gateway():
-    st.title("Payment Gateway")
-    st.write("Pay for school/university fees or attestation services securely.")
-    service = st.selectbox("Select Service:", ["School Fees", "University Fees", "Attestation Fees"])
-    amount = st.number_input("Enter Amount (AED):", min_value=1)
-    card_number = st.text_input("Card Number")
-    if st.button("Pay Now"):
-        if amount and card_number:
-            st.success(f"Payment of AED {amount} for {service} completed successfully!")
+    st.write("Search for schools based on criteria or by name.")
+    search_query = st.text_input("Enter school name or keyword:")
+    if search_query:
+        results = schools_data[schools_data.apply(
+            lambda row: search_query.lower() in row.to_string().lower(), axis=1)]
+        if not results.empty:
+            st.write("Search Results:")
+            st.table(results)
         else:
-            st.error("Please fill all payment details.")
+            st.warning("No matching schools found.")
 
-# Add placeholder functions for other features
-def university_search():
+elif menu_options[selected_tab] == "University Search":
     st.title("University Search")
-    st.write("Coming soon: Explore UAE and international universities.")
+    st.write("Find universities based on criteria or search by name.")
+    search_query = st.text_input("Enter university name or keyword:")
+    if search_query:
+        results = universities_data[universities_data.apply(
+            lambda row: search_query.lower() in row.to_string().lower(), axis=1)]
+        if not results.empty:
+            st.write("Search Results:")
+            st.table(results)
+        else:
+            st.warning("No matching universities found.")
 
-def parent_teacher_communication():
+elif menu_options[selected_tab] == "Parent-Teacher Communication":
     st.title("Parent-Teacher Communication")
-    st.write("Coming soon: Stay connected with teachers and administrators.")
+    message = st.text_area("Send a message to the teacher or school admin:")
+    if st.button("Send Message"):
+        st.success("Your message has been sent successfully!")
 
-def student_services():
+elif menu_options[selected_tab] == "Student Services":
     st.title("Student Services Hub")
-    st.write("Coming soon: Access textbooks, assignments, and grades.")
+    st.write("Access resources such as e-textbooks, grades, and exam materials.")
+    st.button("Download E-Textbooks")
+    st.button("View Grades")
 
-def transportation_management():
+elif menu_options[selected_tab] == "Transportation Management":
     st.title("Transportation Management")
-    st.write("Coming soon: Real-time bus tracking and route management.")
+    st.write("Track buses in real-time or manage payment and routes.")
+    st.button("Track My Bus")
+    st.button("Manage Routes")
 
-def events_announcements():
+elif menu_options[selected_tab] == "Payment Gateway":
+    st.title("Payment Gateway")
+    st.write("Pay school and university fees securely.")
+    payment_amount = st.number_input("Enter payment amount:")
+    if st.button("Proceed to Payment"):
+        st.success(f"Payment of {payment_amount} AED processed successfully!")
+
+elif menu_options[selected_tab] == "Events & Announcements":
     st.title("Events & Announcements")
-    st.write("Coming soon: Stay updated on school events and holidays.")
+    st.write("""
+    - **Parent-Teacher Meeting:** 25 January 2025  
+    - **Sports Day:** 10 February 2025  
+    """)
 
-def student_records():
+elif menu_options[selected_tab] == "Student Records":
     st.title("Student Records")
-    st.write("Coming soon: Securely access and share transcripts.")
+    st.write("Download student transcripts and certificates.")
+    st.button("Download Transcript")
 
-def ai_guidance():
-    st.title("AI-Powered Guidance")
-    st.write("Coming soon: Personalized career counseling and advice.")
+elif menu_options[selected_tab] == "AI-Powered Guidance":
+    st.title("AI-Powered Career Guidance")
+    field = st.selectbox("Choose your field of interest:", ["STEM", "Arts", "Business", "Sports"])
+    st.button(f"Get Guidance for {field}")
 
-if __name__ == "__main__":
-    main()
+# Footer
+st.sidebar.markdown("---")
+st.sidebar.markdown("© 2025 Dubai Schools & Universities Hub")
